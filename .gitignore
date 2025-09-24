@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Libs/BR-SDK_Debug.lib
+/Libs/BR-SDK_Release.lib
