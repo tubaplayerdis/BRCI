@@ -22,7 +22,7 @@
 #define RET1 return 1
 #define World() SDK::UWorld::GetWorld()
 #include <string>
-#include "SDK.hpp"
+#include <BR-SDK.hpp>
 #include "interpreter.h"
 
 namespace global

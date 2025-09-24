@@ -16,9 +16,8 @@
 #include <windows.h>
 #include "global.h"
 #include "hooks.h"
-#include <MinHook.h>
 #include <psapi.h>
-#include "SDK.hpp"
+#include <BR-SDK.hpp>
 
 #define PRESSED 0x8000
 

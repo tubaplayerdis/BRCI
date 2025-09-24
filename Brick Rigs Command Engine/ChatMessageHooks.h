@@ -11,20 +11,19 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-#include "SDK.hpp"
+#include <BR-SDK.hpp>
 #include "windows.h"
 
 namespace hooks
 {
+	constexpr const char* ADD_CHAT_MESSAGE = "48 89 7C 24 ?? 41 56 48 83 EC ?? 48 8B FA 4C 8B F1 E8 ?? ?? ?? ?? 84 C0 0F 84 ?? ?? ?? ??";
+	constexpr const char* FBRICK_CHAT_MESSAGE = "48 89 5C 24 ?? 57 48 83 EC ?? 88 11 48 8B D9 48 83 C1 ?? 49 8B D0 33 FF E8 ?? ?? ?? ??";
+	constexpr const char* F_SLATE_COLOR = "0F 10 02 33 C0 0F 11 01 48 89 41 ?? 48 89 41 ?? 48 8B C1 C6 41 ?? ?? C3";
+
 	namespace AddChatMessage
 	{
 		inline bool enabled = false;
 		inline bool initalized = false;
-		inline const char* pattern =
-			"\x48\x89\x7C\x24\x18\x41\x56\x48\x83\xEC\x40\x48\x8B\xFA\x4C\x8B\xF1"
-			"\xE8\x00\x00\x00\x00\x84\xC0\x0F\x84\x00\x00\x00\x00";
-		inline const char* mask =
-			"xxxxxxxxxxxxxxxxxx????xxxx????";
 		inline uintptr_t AddChatMessageFunctionPointer = 0;//Initalized in Init()
 
 		using  AddChatMessage_t = void(__fastcall*)(SDK::ABrickGameSession* This, const SDK::FBrickChatMessage& ChatMessage);

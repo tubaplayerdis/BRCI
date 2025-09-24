@@ -12,15 +12,13 @@
 
 #include "ChatMessageHooks.h"
 #include "interpreter.h"
-#include <MinHook.h>
 #include "global.h"
 #include <iostream>
 #include <sstream>
-#include "SDK.hpp"
+#include <BR-SDK.hpp>
 #include <vector>
 #include "GlobalHooks.h"
 
-//TODO: add a shutdown flag to prevent this hook getting ran while the mod is shutting down.
 void __fastcall hooks::AddChatMessage::HookedAddChatMessageFunction(SDK::ABrickGameSession* This, const SDK::FBrickChatMessage& ChatMessage)
 {
     PlayerInfo info;
@@ -62,7 +60,7 @@ void __fastcall hooks::AddChatMessage::HookedAddChatMessageFunction(SDK::ABrickG
 bool hooks::AddChatMessage::Init()
 {
     if (initalized) return false;
-    AddChatMessageFunctionPointer = /*(uintptr_t)GetModuleHandle(NULL) + 0x0E3CB30;*/FindPattern(pattern, mask, GetModuleBaseN(), GetModuleSizeN());
+    AddChatMessageFunctionPointer = ResolveSignature(ADD_CHAT_MESSAGE);//Was grabbed from BRSD
     if (AddChatMessageFunctionPointer == 0) return false;
     MH_STATUS ret = MH_CreateHook((LPVOID)AddChatMessageFunctionPointer, &HookedAddChatMessageFunction, (void**)&OriginalAddChatMessageFunction);
     initalized = true;
@@ -85,7 +83,7 @@ void hooks::AddChatMessage::Disable()
 
 void hooks::constructors::FBrickChatMessageConstructor(SDK::FBrickChatMessage* This, SDK::EChatMessageType ChatType, SDK::ABrickPlayerController* PC)
 {
-    uintptr_t FBrickChatMessageConstructorP = (uintptr_t)GetModuleHandle(NULL) + 0x0D0EA10;
+    uintptr_t FBrickChatMessageConstructorP = ResolveSignature(FBRICK_CHAT_MESSAGE);
 
     using SetLoadoutAccessorFn = void(__fastcall*)(SDK::FBrickChatMessage* Thiss, SDK::EChatMessageType ChatTypee, SDK::ABrickPlayerController* PCC);
     SetLoadoutAccessorFn OnFBrickChatMessageConstructor = reinterpret_cast<SetLoadoutAccessorFn>(FBrickChatMessageConstructorP);
@@ -95,13 +93,7 @@ void hooks::constructors::FBrickChatMessageConstructor(SDK::FBrickChatMessage* T
 
 void hooks::constructors::FSlateColorConstructor(SDK::FSlateColor* This, SDK::FLinearColor* InColor)
 {
-    const char* pattern =
-        "\x0F\x10\x02\x33\xC0\x0F\x11\x01"
-        "\x48\x89\x41\x18\x48\x89\x41\x20"
-        "\x48\x8B\xC1\xC6\x41\x10\x00\xC3";
-    const char* mask = "xxxxxxxxxxxxxxxxxxxxxxxx";
-
-    uintptr_t FSlateColorConstructorPointer = FindPattern(pattern, mask, GetModuleBaseN(), GetModuleSizeN());
+    uintptr_t FSlateColorConstructorPointer = ResolveSignature(F_SLATE_COLOR);
 
     using FSlateColorConstructorFn = void(__fastcall*)(SDK::FSlateColor* Thiss, SDK::FLinearColor* InColorr);
     FSlateColorConstructorFn OnFSlateColorConstructor = reinterpret_cast<FSlateColorConstructorFn>(FSlateColorConstructorPointer);

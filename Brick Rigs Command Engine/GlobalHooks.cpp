@@ -11,7 +11,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "GlobalHooks.h"
-#include "MinHook.h"
+#include <Utils/GameFunctions.hpp>
 #include "global.h"
 #include "ChatMessageHooks.h"
 #include "HelpLists.h"
@@ -46,7 +46,7 @@ void __fastcall hooks::BeginPlay::HookedBeginPlayFunction(SDK::UWorld* This)
 bool hooks::BeginPlay::Init()
 {
 	if (initalized) return false;
-	BeginPlayFunctionPointer = FindPattern(pattern, mask, GetModuleBaseN(), GetModuleSizeN());
+	BeginPlayFunctionPointer = ResolveSignature(signature);
 	if (BeginPlayFunctionPointer == 0) return false;
 	MH_STATUS ret = MH_CreateHook((LPVOID)BeginPlayFunctionPointer, &HookedBeginPlayFunction, (void**)&OriginalBeginPlayFunction);
 	initalized = true;
@@ -65,36 +65,6 @@ void hooks::BeginPlay::Disable()
 	if (!initalized || !enabled) return;
 	MH_DisableHook((LPVOID)BeginPlayFunctionPointer);
 	enabled = false;
-}
-
-SDK::UUserWidget* hooks::Functions::CreateWidget::CreateWidget(SDK::UWorld* OwningObject, SDK::TSubclassOf<SDK::UUserWidget> UserWidgetClass, SDK::FName WidgetName)
-{
-	uintptr_t CreateWidgetFunction = (uintptr_t)GetModuleHandle(NULL) + 0x0CC6140;
-
-	using CreateWidgetFn = SDK::UUserWidget*(__fastcall*)(SDK::UWorld* OwningObject, SDK::TSubclassOf<SDK::UUserWidget> UserWidgetClass, SDK::FName WidgetName);
-	CreateWidgetFn OnCreateWidgetFunction = reinterpret_cast<CreateWidgetFn>(CreateWidgetFunction);
-
-	return OnCreateWidgetFunction(OwningObject, UserWidgetClass, WidgetName);
-}
-
-char hooks::Functions::OpenPopup::OpenPopup(SDK::UWindowManagerWidget* This, SDK::UClass* HandleT, SDK::UPopupParams* PopupParams, bool bToggleOpen)
-{
-	uintptr_t OpenPopupFunction = (uintptr_t)GetModuleHandle(NULL) + 0x0DDCD00;
-
-	using OpenPopupFn = char (__fastcall*)(SDK::UWindowManagerWidget* Thiss, SDK::UClass* HandleTT, SDK::UPopupParams* PopupParamss, bool bToggleOpenn);
-	OpenPopupFn OnOpenPopupFunction = reinterpret_cast<OpenPopupFn>(OpenPopupFunction);
-
-	return OnOpenPopupFunction(This, HandleT, PopupParams, bToggleOpen);
-}
-
-char hooks::Functions::Initalize::Initalize(SDK::UPopupContainerWidget* This)
-{
-	uintptr_t InitalizeFunction = (uintptr_t)GetModuleHandle(NULL) + 0x0DC7220;
-
-	using InitalizeFn = char(__fastcall*)(SDK::UPopupContainerWidget* Thiss);
-	InitalizeFn OnInitalizeFunction = reinterpret_cast<InitalizeFn>(InitalizeFunction);
-
-	return OnInitalizeFunction(This);
 }
 
 void __fastcall hooks::DrawTransition::HookedDrawTransitionFunction(SDK::UGameViewportClient* This, SDK::UCanvas* Canvas)
@@ -137,7 +107,7 @@ void hooks::Functions::SynchronizeProperties::SynchronizeProperties(SDK::UBrickB
 {
 	if (SynchronizePropertiesFunction == 0) {
 		std::cout << "Finding first time signature for syncprops!" << std::endl;
-		SynchronizePropertiesFunction = FindPattern(pattern, mask, GetModuleBaseN(), GetModuleSizeN());
+		SynchronizePropertiesFunction = ResolveSignature(signature);
 		std::cout << "Found signature!" << std::endl;
 	}
 
@@ -149,7 +119,7 @@ void hooks::Functions::SynchronizeProperties::SynchronizeProperties(SDK::UBrickB
 
 bool hooks::Functions::SynchronizeProperties::Init()
 {
-	SynchronizePropertiesFunction = (uintptr_t)GetModuleHandle(NULL) + 0x0DE8030;
+	SynchronizePropertiesFunction = ResolveSignature(signature);
 	return SynchronizePropertiesFunction != 0;
 }
 
@@ -165,7 +135,7 @@ void __fastcall hooks::OpenMenu::HookedOpenMenuFunction(SDK::UMenuWidget* This, 
 bool hooks::OpenMenu::Init()
 {
 	if (initalized) return false;
-	OpenMenuFunctionPointer = FindPattern(pattern, mask, GetModuleBaseN(), GetModuleSizeN());
+	OpenMenuFunctionPointer = ResolveSignature(signature);
 	if (OpenMenuFunctionPointer == 0) return false;
 	MH_STATUS ret = MH_CreateHook((LPVOID)OpenMenuFunctionPointer, &HookedOpenMenuFunction, (void**)&OriginalOpenMenuFunction);
 	initalized = true;
@@ -212,7 +182,7 @@ void __fastcall hooks::OnPlayerJoined::HookedOnPlayerJoinedFunction(SDK::ABrickG
 bool hooks::OnPlayerJoined::Init()
 {
 	if (initalized) return false;
-	OnPlayerJoinedFunctionPointer = FindPattern(pattern, mask, GetModuleBaseN(), GetModuleSizeN());
+	OnPlayerJoinedFunctionPointer = ResolveSignature(signature);
 	if (OnPlayerJoinedFunctionPointer == 0) return false;
 	MH_STATUS ret = MH_CreateHook((LPVOID)OnPlayerJoinedFunctionPointer, &HookedOnPlayerJoinedFunction, (void**)&OriginalOnPlayerJoinedFunction);
 	initalized = true;
@@ -245,7 +215,7 @@ char __fastcall hooks::LoadMap::HookedLoadMapFunction(SDK::UEngine* This, SDK::F
 bool hooks::LoadMap::Init()
 {
 	if (initalized) return false;
-	LoadMapFunctionPointer = FindPattern(pattern, mask, GetModuleBaseN(), GetModuleSizeN());
+	LoadMapFunctionPointer = ResolveSignature(signature);
 	if (LoadMapFunctionPointer == 0) return false;
 	MH_STATUS ret = MH_CreateHook((LPVOID)LoadMapFunctionPointer, &HookedLoadMapFunction, (void**)&OriginalLoadMapFunction);
 	initalized = true;
@@ -295,10 +265,11 @@ void __fastcall hooks::StartPlay::HookedStartPlayFunction(SDK::AGameMode* This)
 bool hooks::StartPlay::Init()
 {
 	if (initalized) return false;
-	StartPlayFunctionPointer = FindPattern(pattern, mask, GetModuleBaseN(), GetModuleSizeN());
+	StartPlayFunctionPointer = ResolveSignature(signature);
 	if (StartPlayFunctionPointer == 0) return false;
 	MH_STATUS ret = MH_CreateHook((LPVOID)StartPlayFunctionPointer, &HookedStartPlayFunction, (void**)&OriginalStartPlayFunction);
 	initalized = true;
+	std::cout << ret << std::endl;
 	return ret == MH_OK;
 }
 

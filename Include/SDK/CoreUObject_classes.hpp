@@ -108,7 +108,17 @@ public:
 	class FField*                                 ChildProperties;                                   // 0x0050(0x0008)(NOT AUTO-GENERATED PROPERTY)
 	int32                                         Size;                                              // 0x0058(0x0004)(NOT AUTO-GENERATED PROPERTY)
 	int32                                         MinAlignemnt;                                      // 0x005C(0x0004)(NOT AUTO-GENERATED PROPERTY)
-	uint8                                         Pad_60[0x50];                                      // 0x0060(0x0050)(Fixing Struct Size After Last Property [ Dumper-7 ])
+	
+	// BEGIN: Real fields replacing Pad_60[0x50]
+	TArray<uint8>                                 Script; // 0x60
+	FProperty*									  PropertyLink;						// 0x70
+	FProperty*									  RefLink;							// 0x78
+	FProperty*									  DestructorLink;					// 0x80
+	FProperty*									  PostConstructLink;				// 0x88
+	TArray<UObject*>                              ScriptAndPropertyObjectReferences;// 0x90
+	// We don't need these two fields
+	uint8                                         Pad_A0[0x10];                   // 0xA0 to 0xB0
+	// END
 
 public:
 	bool IsSubclassOf(const UStruct* Base) const;
@@ -294,12 +304,50 @@ public:
 static_assert(alignof(UTextBuffer) == 0x000008, "Wrong alignment on UTextBuffer");
 static_assert(sizeof(UTextBuffer) == 0x000050, "Wrong size on UTextBuffer");
 
+struct FPackageId
+{
+	unsigned __int64 Id;
+};
+static_assert(sizeof(FPackageId) == sizeof(uint8_t[0x8]));
+
+//IDA measures sizes in bytes btw
 // Class CoreUObject.Package
-// 0x0078 (0x00A0 - 0x0028)
+// 0x0078 (0x00A0 - 0x0028) //160 bytes
 class UPackage final : public UObject
 {
 public:
-	uint8                                         Pad_28[0x78];                                      // 0x0028(0x0078)(Fixing Struct Size After Last Property [ Dumper-7 ])
+	union
+	{
+		uint8 FlagsByte; // raw access if needed
+		struct
+		{
+			uint8 bDirty : 1;                 // 0x28.0
+			uint8 bHasBeenFullyLoaded : 1;    // 0x28.1
+			uint8 bCanBeImported : 1;         // 0x28.2
+			uint8 PadFlags : 5;               // padding bits 0x28.3-0x28.7
+		};
+	};                                        // 0x28
+	uint8 Pad_29[0x3];                        // 0x29,0x2A,0x2B
+
+	float LoadTime;                           // 0x2C
+	uint8_t Guid[0x10];                               // 0x30 (16 bytes)
+	TArray<int32> ChunkIDs;                    // 0x40
+	uint32 PackageFlagsPrivate;                // 0x50
+	uint8 Pad_54[0x4];                         // 0x54,0x55,0x56,0x57
+
+	FPackageId PackageId;                      // 0x58
+	int32 PIEInstanceID;                       // 0x60
+	FName FileName;                            // 0x64
+	uint8 Pad_6C[0x4];                         // 0x6C,0x6D,0x6E,0x6F
+
+	void* LinkerLoad;                   // 0x70
+	int32 LinkerPackageVersion;                 // 0x78
+	int32 LinkerLicenseeVersion;                // 0x7C
+
+	uint8_t LinkerCustomVersion[0x10]; // 0x80
+	unsigned __int64 FileSize;                            // 0x90
+
+	uint8_t WorldTileInfo[0x8];   // 0x98
 
 public:
 	static class UClass* StaticClass()

@@ -11,7 +11,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "global.h"
-#include "SDK.hpp"
+#include <BR-SDK.hpp>
 #include "Windows.h"
 #include "modules.h"
 #include "interpreter.h"
@@ -216,6 +216,8 @@ void global::UpdatePointers(SDK::UWorld* NewWorld)
 
 	updatingPointers = false;
 }
+
+#undef SpawnObject
 
 bool global::watermark::InitalizeWaterMark()
 {

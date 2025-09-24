@@ -13,7 +13,7 @@
 #include "pch.h"
 #include "stdio.h"
 #include "main.h"
-#include <MinHook.h>
+#include <Hooking/MinHook/MinHook.h>
 
 
 FILE* pStdIn = nullptr;

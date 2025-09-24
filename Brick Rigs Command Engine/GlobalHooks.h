@@ -11,7 +11,7 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
-#include "SDK.hpp"
+#include <BR-SDK.hpp>
 #include "windows.h"
 #include <Psapi.h>
 
@@ -61,8 +61,7 @@ namespace hooks
 	{
 		inline bool enabled = false;
 		inline bool initalized = false;
-		inline const char* pattern = "\x40\x53\x48\x83\xEC\x20\x48\x8B\xD9\x48\x8B\x89\x18\x01\x00\x00\x48\x85\xC9\x74\x1E\x48\x8B\x01";
-		inline const char* mask = "xxxxxxxxxxxxxxxxxxxxxxx";
+        constexpr const char* signature = "40 53 48 83 EC ?? 48 8B D9 48 8B 89 ?? ?? ?? ?? 48 85 C9 74 ?? 48 8B 01 FF 90 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 48 85 C9 74 ?? 48 8B 01";
         inline uintptr_t BeginPlayFunctionPointer = 0; //Initalized in Init().
 
 		using  BeginPlay_t = void(__fastcall*)(SDK::UWorld* This);
@@ -98,8 +97,7 @@ namespace hooks
     {
         inline bool enabled = false;
         inline bool initalized = false;
-        inline const char* pattern = "\x48\x89\x54\x24\x10\x55\x53\x56\x57\x41\x54\x41\x55\x48\x8D\x6C\x24\xD1\x48\x81\xEC";
-        inline const char* mask = "xxxxxxxxxxxxxxxxxxxx";
+        constexpr const char* signature = "48 89 54 24 ?? 55 53 56 57 41 54 41 55 48 8D 6C 24 ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4";
         inline uintptr_t OpenMenuFunctionPointer = 0;
 
         using OpenMenu_t = void(__fastcall*)(SDK::UMenuWidget* This, SDK::FName InMenu);
@@ -116,8 +114,7 @@ namespace hooks
     {
         inline bool enabled = false;
         inline bool initalized = false;
-        inline const char* pattern = "\x48\x83\xEC\x48\x48\x89\x5C\x24\x58\x33\xDB\x48\x89\x74\x24\x68\x48\x89\x7C\x24\x40";
-        inline const char* mask = "xxxxxxxxxxxxxxxxxxxx";
+        constexpr const char* signature = "48 83 EC ?? 48 89 5C 24 ?? 33 DB 48 89 74 24 ?? 48 89 7C 24 ?? 4C 89 74 24 ??";
         inline uintptr_t OnPlayerJoinedFunctionPointer = 0;
 
         using OnPlayerJoined_t = void(__fastcall*)(SDK::ABrickGameSession* This, SDK::ABrickPlayerController* PC);
@@ -134,8 +131,7 @@ namespace hooks
     {
         inline bool enabled = false;
         inline bool initalized = false;
-        inline const char* pattern = "\x48\x89\x5C\x24\x20\x55\x56\x57\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\x6C\x24\x80\x48\x81\xEC\x80\x01\x00\x00\x0F\x29\xBC\x24\x60\x01\x00\x00\x48\x8B\x05\x65\x77\xA7\x01";
-        inline const char* mask = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        constexpr const char* signature = "48 89 5C 24 ?? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ?? 48 81 EC ?? ?? ?? ?? 0F 29 BC 24 ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4";
         inline uintptr_t LoadMapFunctionPointer = 0;
 
         using LoadMap_t = char(__fastcall*)(SDK::UEngine* This, SDK::FWorldContext* WorldContext, void* URL, void* Pending, void* Error);
@@ -152,8 +148,7 @@ namespace hooks
     {
         inline bool enabled = false;
         inline bool initalized = false;
-        inline const char* pattern = "\x40\x53\x48\x83\xEC\x20\x48\x8B\xD9\x48\x8B\x89\x80\x02\x00\x00\x48\x8B\x01";
-        inline const char* mask = "xxxxxxxxxxxxxxxxxxx";
+        constexpr const char* signature = "40 53 48 83 EC ?? 48 8B D9 48 8B 89 ?? ?? ?? ?? 48 8B 01 FF 90 ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 39 83 ?? ?? ?? ?? 75 ?? 48 8B 03 48 8B CB";
         inline uintptr_t StartPlayFunctionPointer = 0;
 
         using StartPlay_t = void(__fastcall*)(SDK::AGameMode* This);
@@ -168,25 +163,9 @@ namespace hooks
 
     namespace Functions
     {
-        namespace CreateWidget
-        {
-            SDK::UUserWidget* CreateWidget(SDK::UWorld* OwningObject, SDK::TSubclassOf<SDK::UUserWidget> UserWidgetClass, SDK::FName WidgetName);
-        }
-
-        namespace OpenPopup
-        {
-            char OpenPopup(SDK::UWindowManagerWidget* This, SDK::UClass* HandleT, SDK::UPopupParams* PopupParams, bool bToggleOpen);
-        }
-
-        namespace Initalize
-        {
-            char Initalize(SDK::UPopupContainerWidget* This);
-        }
-
         namespace SynchronizeProperties
         {   
-            inline const char* pattern = ""; //Signature is failng. Currently using raw address
-            inline const char* mask = "";
+            constexpr const char* signature = "48 89 5C 24 ?? 48 89 74 24 ?? 55 57 41 54 41 56 41 57 48 8B EC 48 83 EC ?? 48 8B F1 E8 ?? ?? ?? ?? 45 33 E4 45 33 C0 BA ?? ?? ?? ??";
             inline uintptr_t SynchronizePropertiesFunction = 0;//Calculated at first run.
             void SynchronizeProperties(SDK::UBrickBorder* This);
             bool Init(); //Find the address
